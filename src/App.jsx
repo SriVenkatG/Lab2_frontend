@@ -13,10 +13,13 @@ function App() {
   const [products, setProducts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
 
+  const BASE_URL = 'http://localhost:9090/springapp1';
+
   const handleChange = (e) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setProduct((prev) => ({ ...prev, [name]: value }));
   };
-const BASE_URL = 'http://localhost:9090/springapp1';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -37,8 +40,13 @@ const BASE_URL = 'http://localhost:9090/springapp1';
   };
 
   const fetchProducts = async () => {
-    const res = await axios.get(`${BASE_URL}/display`);
-    setProducts(res.data);
+    try {
+      const res = await axios.get(`${BASE_URL}/display`);
+      setProducts(res.data);
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      alert('Failed to load products');
+    }
   };
 
   const editProduct = (p) => {
@@ -46,15 +54,18 @@ const BASE_URL = 'http://localhost:9090/springapp1';
     setIsEditing(true);
   };
 
- 
   const deleteProduct = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
-      await axios.delete(`${BASE_URL}/delete/${id}`);
-      alert('Delete successful');
-      fetchProducts();
+      try {
+        await axios.delete(`${BASE_URL}/delete/${id}`);
+        alert('Delete successful');
+        fetchProducts();
+      } catch (error) {
+        console.error('Delete failed:', error);
+        alert('Delete failed');
+      }
     }
   };
-
 
   useEffect(() => {
     fetchProducts();
@@ -66,7 +77,7 @@ const BASE_URL = 'http://localhost:9090/springapp1';
         <h2 className="text-center mb-4">{isEditing ? 'Edit Product' : 'Add Product'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group row">
-            <label htmlFor="id" className="col-sm-3 col-form-label form-label">ID:</label>
+            <label htmlFor="id" className="col-sm-3 col-form-label">ID:</label>
             <div className="col-sm-9">
               <input
                 type="number"
@@ -81,7 +92,7 @@ const BASE_URL = 'http://localhost:9090/springapp1';
             </div>
           </div>
           <div className="form-group row">
-            <label htmlFor="name" className="col-sm-3 col-form-label form-label">Name:</label>
+            <label htmlFor="name" className="col-sm-3 col-form-label">Name:</label>
             <div className="col-sm-9">
               <input
                 type="text"
@@ -95,7 +106,7 @@ const BASE_URL = 'http://localhost:9090/springapp1';
             </div>
           </div>
           <div className="form-group row">
-            <label htmlFor="os" className="col-sm-3 col-form-label form-label">OS:</label>
+            <label htmlFor="os" className="col-sm-3 col-form-label">OS:</label>
             <div className="col-sm-9">
               <input
                 type="text"
@@ -109,7 +120,7 @@ const BASE_URL = 'http://localhost:9090/springapp1';
             </div>
           </div>
           <div className="form-group row">
-            <label htmlFor="price" className="col-sm-3 col-form-label form-label">Price:</label>
+            <label htmlFor="price" className="col-sm-3 col-form-label">Price:</label>
             <div className="col-sm-9">
               <input
                 type="text"
@@ -142,7 +153,7 @@ const BASE_URL = 'http://localhost:9090/springapp1';
         </form>
       </div>
 
-      <h3 className="text-center">Product List</h3>
+      <h3 className="text-center mt-4">Product List</h3>
       <table className="table table-bordered table-striped mt-3">
         <thead className="table-dark">
           <tr>
@@ -160,21 +171,9 @@ const BASE_URL = 'http://localhost:9090/springapp1';
               <td>{p.name}</td>
               <td>{p.os}</td>
               <td>{p.price}</td>
-              <td className="actions-cell">
-                <button
-                  className="btn btn-warning btn-sm"
-                  onClick={() => editProduct(p)}
-                >
-                  Edit
-                </button>
-                {
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => deleteProduct(p.id)}
-                >
-                  Delete
-                </button>
-                }
+              <td>
+                <button className="btn btn-warning btn-sm me-2" onClick={() => editProduct(p)}>Edit</button>
+                <button className="btn btn-danger btn-sm" onClick={() => deleteProduct(p.id)}>Delete</button>
               </td>
             </tr>
           ))}
