@@ -13,7 +13,7 @@ function App() {
   const [products, setProducts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
 
-  const BASE_URL = 'http://localhost:9090/springapp1';
+  const BASE_URL = 'http://localhost:9090';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
